@@ -8,7 +8,7 @@
     "start": "next start",
     "test": "yarn type-check",
     "type-check": "tsc --noEmit",
-    "build:schema": "graphql-codegen --config codegen.yml"
+    "build:schema": "graphql-codegen -r dotenv/config --config codegen.yml"
   },
   "prettier": {
     "trailingComma": "es5",
