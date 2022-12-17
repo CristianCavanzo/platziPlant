@@ -7,7 +7,7 @@ import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 
 export const getStaticProps: GetStaticProps<{ plants: Plant[] }> = async () => {
   const plants = await getPlantList({ limit: 10 })
-  return { props: { plants } }
+  return { props: { plants }, revalidate: 5 * 60 }
 }
 export default function Home({
   plants,

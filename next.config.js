@@ -3,9 +3,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const config = {
-  future: {
-    webpack5: true,
-  },
+  future: {},
 }
 
 module.exports = withBundleAnalyzer(config)
