@@ -3,7 +3,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const config = {
-  future: {},
+  images: {
+    domains: ['images.ctfassets.net'],
+  },
 }
 
 module.exports = withBundleAnalyzer(config)

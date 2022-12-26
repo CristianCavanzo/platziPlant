@@ -4,6 +4,7 @@ import { Typography } from '@ui/Typography'
 import { Button } from '@ui/Button'
 
 import { Excerpt } from '@components/Excerpt'
+import NextImage, { ImageLoaderProps } from 'next/image'
 
 type PlantCollectionProps = {
   plants: Plant[]
@@ -49,12 +50,64 @@ export function PlantEntry({ plant, variant = 'square' }: PlantEntryType) {
   )
 }
 
+type ImageProps = {
+  layout: 'responsive' | 'intrinsic'
+  src: string
+  width: number
+  height?: never
+  aspectRatio: '1:1' | '4:3' | '16:9'
+  fit?: 'pad' | 'fill' | 'cropt' | 'scale'
+}
+
+const aspectRatioToRatio = {
+  '1:1': 1,
+  '4:3': 3 / 4,
+  '16:9': 9 / 16,
+}
+
+const calcAspectRatio = (
+  aspectRatio: ImageProps['aspectRatio'],
+  width: ImageProps['width']
+) => {
+  let ratio = Math.floor(width * aspectRatioToRatio[aspectRatio])
+  return ratio
+}
+
+const ImageComponent = ({
+  layout,
+  src,
+  width,
+  aspectRatio,
+  fit = 'scale',
+}: ImageProps) => {
+  const height = calcAspectRatio(aspectRatio, width)
+  const loader = (props: ImageLoaderProps): string => {
+    const loaderHeigth = calcAspectRatio(aspectRatio, props.width)
+    return `${props.src}?w=${props.width}&h=${loaderHeigth}&fit=${fit}`
+  }
+  return (
+    <NextImage
+      layout={layout}
+      src={src}
+      width={width}
+      height={height}
+      loader={loader}
+    />
+  )
+}
+
 export function PlantEntrySquare({ image, plantName, slug }: Plant) {
   return (
     <Link href={`/entry/${slug}`}>
       <a title={`Go to ${plantName}`}>
         <div className="opacity-95 hover:opacity-100">
-          <img src={image.url} width={460} />
+          <ImageComponent
+            layout="responsive"
+            src={image.url}
+            width={460}
+            aspectRatio="1:1"
+            fit="fill"
+          />
           <div className="p-4">
             <Typography variant="h4" className="break-words">
               {plantName}
