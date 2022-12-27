@@ -88,6 +88,7 @@ export function TabPanel(props: TabPanelProps) {
       className="flex-grow"
       id={`vertical-tabpanel-${index}`}
       aria-labelledby={`vertical-tab-${index}`}
+      style={{ overflow: 'inherit!important' }}
       {...other}
     >
       {isHidden ? null : <div className="px-8 pt-3 pb-8">{children}</div>}
