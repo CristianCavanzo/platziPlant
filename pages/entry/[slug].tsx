@@ -1,34 +1,24 @@
+import { GetStaticProps, InferGetStaticPropsType, GetStaticPaths } from 'next'
+import Link from 'next/link'
+
+import { getPlant, getPlantList, getCategoryList } from '@api'
+
 import { Layout } from '@components/Layout'
 import { Typography } from '@ui/Typography'
 import { Grid } from '@ui/Grid'
 
 import { RichText } from '@components/RichText'
 import { AuthorCard } from '@components/AuthorCard'
-import { getPlant, getPlantList } from '@api/index'
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next'
+import { PlantEntryInline } from '@components/PlantCollection'
+import { Image } from '@components/Image'
 
-type PlantEntryProps = {
+type PlantEntryPageProps = {
   plant: Plant
-}
-type PathType = {
-  params: {
-    slug: string
-  }
+  otherEntries: Plant[]
+  categories: Category[]
 }
 
-export const getStaticPaths: GetStaticPaths<{}> = async () => {
-  const entries = await getPlantList({
-    limit: 10,
-  })
-  const paths: PathType[] = entries.map((plant) => ({
-    params: {
-      slug: plant.slug,
-    },
-  }))
-  return { paths, fallback: 'blocking' }
-}
-
-export const getStaticProps: GetStaticProps<PlantEntryProps> = async ({
+export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   params,
 }) => {
   const slug = params?.slug
@@ -41,28 +31,70 @@ export const getStaticProps: GetStaticProps<PlantEntryProps> = async ({
 
   try {
     const plant = await getPlant(slug)
+
+    // Sidebar – This could be a single request since we are using GraphQL :)
+    const otherEntries = await getPlantList({
+      limit: 5,
+    })
+    const categories = await getCategoryList({ limit: 10 })
+
     return {
       props: {
         plant,
-        revalidate: 5 * 60,
+        otherEntries,
+        categories,
       },
+      revalidate: 5 * 60, // once every five minutes
     }
-  } catch (error) {
+  } catch (e) {
     return {
       notFound: true,
     }
   }
 }
 
+type PathType = {
+  params: {
+    slug: string
+  }
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Match home query.
+  // @TODO how do we generate all of our pages if we don't know the number? 🤔
+  const plantEntriesToGenerate = await getPlantList({ limit: 10 })
+
+  const paths: PathType[] = plantEntriesToGenerate.map(({ slug }) => ({
+    params: {
+      slug,
+    },
+  }))
+
+  return {
+    paths,
+
+    // Block until the server gets its data. Like in Server side rendering
+    fallback: 'blocking',
+  }
+}
+
 export default function PlantEntryPage({
   plant,
+  otherEntries,
+  categories,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <Layout>
       <Grid container spacing={4}>
         <Grid item xs={12} md={8} lg={9} component="article">
           <figure>
-            <img />
+            <Image
+              width={952}
+              aspectRatio="4:3"
+              layout="intrinsic"
+              src={plant.image.url}
+              alt={plant.image.title}
+            />
           </figure>
           <div className="px-12 pt-8">
             <Typography variant="h2">{plant.plantName}</Typography>
@@ -74,13 +106,29 @@ export default function PlantEntryPage({
         <Grid item xs={12} md={4} lg={3} component="aside">
           <section>
             <Typography variant="h5" component="h3" className="mb-4">
-              Recent Posts
+              Recent posts
             </Typography>
+            {otherEntries.map((plantEntry) => (
+              <article className="mb-4" key={plantEntry.id}>
+                <PlantEntryInline {...plantEntry} />
+              </article>
+            ))}
           </section>
           <section className="mt-10">
             <Typography variant="h5" component="h3" className="mb-4">
               Categories
             </Typography>
+            <ul className="list">
+              {categories.map((category) => (
+                <li key={category.id}>
+                  <Link passHref href={`/category/${category.slug}`}>
+                    <Typography component="a" variant="h6">
+                      {category.title}
+                    </Typography>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </section>
         </Grid>
       </Grid>

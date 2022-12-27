@@ -6,6 +6,9 @@ const config = {
   images: {
     domains: ['images.ctfassets.net'],
   },
+  images: {
+    domains: ['images.ctfassets.net'],
+  },
 }
 
 module.exports = withBundleAnalyzer(config)

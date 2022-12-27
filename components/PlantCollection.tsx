@@ -4,7 +4,7 @@ import { Typography } from '@ui/Typography'
 import { Button } from '@ui/Button'
 
 import { Excerpt } from '@components/Excerpt'
-import NextImage, { ImageLoaderProps } from 'next/image'
+import { Image } from '@components/Image'
 
 type PlantCollectionProps = {
   plants: Plant[]
@@ -73,40 +73,16 @@ const calcAspectRatio = (
   return ratio
 }
 
-const ImageComponent = ({
-  layout,
-  src,
-  width,
-  aspectRatio,
-  fit = 'scale',
-}: ImageProps) => {
-  const height = calcAspectRatio(aspectRatio, width)
-  const loader = (props: ImageLoaderProps): string => {
-    const loaderHeigth = calcAspectRatio(aspectRatio, props.width)
-    return `${props.src}?w=${props.width}&h=${loaderHeigth}&fit=${fit}`
-  }
-  return (
-    <NextImage
-      layout={layout}
-      src={src}
-      width={width}
-      height={height}
-      loader={loader}
-    />
-  )
-}
-
 export function PlantEntrySquare({ image, plantName, slug }: Plant) {
   return (
     <Link href={`/entry/${slug}`}>
       <a title={`Go to ${plantName}`}>
         <div className="opacity-95 hover:opacity-100">
-          <ImageComponent
-            layout="responsive"
+          <Image
             src={image.url}
+            layout="intrinsic"
             width={460}
-            aspectRatio="1:1"
-            fit="fill"
+            aspectRatio="4:3"
           />
           <div className="p-4">
             <Typography variant="h4" className="break-words">
@@ -131,7 +107,14 @@ export function PlantEntryInline({
         <div
           className={`opacity-95 hover:opacity-100 flex items-end ${className}`}
         >
-          <img src={image.url} width={84} className="flex-none" />
+          <Image
+            src={image.url}
+            layout="fixed"
+            width={84}
+            aspectRatio="1:1"
+            fit="fill"
+            className="flex-none"
+          />
           <div className="pl-2 flex-auto">
             <Typography variant="h6" className="break-words">
               {plantName}
@@ -153,7 +136,12 @@ export function PlantEntryVertical({
     <div className="opacity-95 hover:opacity-100">
       <Link href={`/entry/${slug}`}>
         <a title={`Go to ${plantName}`}>
-          <img src={image.url} width={624} />
+          <Image
+            src={image.url}
+            width={624}
+            layout="intrinsic"
+            aspectRatio="9:12"
+          />
           <Typography variant="h2" className="break-words pt-4 px-4">
             {plantName}
           </Typography>
