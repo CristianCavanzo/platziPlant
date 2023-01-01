@@ -50,21 +50,6 @@ export function PlantEntry({ plant, variant = 'square' }: PlantEntryType) {
   )
 }
 
-type ImageProps = {
-  layout: 'responsive' | 'intrinsic'
-  src: string
-  width: number
-  height?: never
-  aspectRatio: '1:1' | '4:3' | '16:9'
-  fit?: 'pad' | 'fill' | 'cropt' | 'scale'
-}
-
-const aspectRatioToRatio = {
-  '1:1': 1,
-  '4:3': 3 / 4,
-  '16:9': 9 / 16,
-}
-
 export function PlantEntrySquare({ image, plantName, slug }: Plant) {
   return (
     <Link href={`/entry/${slug}`}>
