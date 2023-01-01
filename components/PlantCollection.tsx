@@ -65,14 +65,6 @@ const aspectRatioToRatio = {
   '16:9': 9 / 16,
 }
 
-const calcAspectRatio = (
-  aspectRatio: ImageProps['aspectRatio'],
-  width: ImageProps['width']
-) => {
-  let ratio = Math.floor(width * aspectRatioToRatio[aspectRatio])
-  return ratio
-}
-
 export function PlantEntrySquare({ image, plantName, slug }: Plant) {
   return (
     <Link href={`/entry/${slug}`}>
