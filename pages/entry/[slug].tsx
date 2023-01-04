@@ -18,9 +18,42 @@ type PlantEntryPageProps = {
   categories: Category[]
 }
 
+type PathType = {
+  params: {
+    slug: string
+  }
+  locale: string
+}
+
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+  if (locales === undefined) {
+    throw new Error('Uh, did you forget to configure your locals')
+  }
+
+  // Match home query.
+  // @TODO how do we generate all of our pages if we don't know the number? 🤔
+  const plantEntriesToGenerate = await getPlantList({ limit: 10 })
+
+  const paths: PathType[] = plantEntriesToGenerate
+    .map(({ slug }) => ({
+      params: {
+        slug,
+      },
+    }))
+    .flatMap((path) => locales.map((locale) => ({ locale: locale, ...path })))
+
+  return {
+    paths,
+
+    // Block until the server gets its data. Like in Server side rendering
+    fallback: 'blocking',
+  }
+}
+
 export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   params,
   preview,
+  locale,
 }) => {
   const slug = params?.slug
 
@@ -31,7 +64,7 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   }
 
   try {
-    const plant = await getPlant(slug, preview)
+    const plant = await getPlant(slug, preview, locale)
 
     // Sidebar – This could be a single request since we are using GraphQL :)
     const otherEntries = await getPlantList({
@@ -51,31 +84,6 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
     return {
       notFound: true,
     }
-  }
-}
-
-type PathType = {
-  params: {
-    slug: string
-  }
-}
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  // Match home query.
-  // @TODO how do we generate all of our pages if we don't know the number? 🤔
-  const plantEntriesToGenerate = await getPlantList({ limit: 10 })
-
-  const paths: PathType[] = plantEntriesToGenerate.map(({ slug }) => ({
-    params: {
-      slug,
-    },
-  }))
-
-  return {
-    paths,
-
-    // Block until the server gets its data. Like in Server side rendering
-    fallback: 'blocking',
   }
 }
 
