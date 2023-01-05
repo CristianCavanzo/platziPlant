@@ -31,8 +31,7 @@ const language: NextApiHandler = (request, response) => {
     })
 
     // 307 (temporary) redirect to homepage
-    response.redirect('/')
-    return response.end()
+    return response.redirect('/')
   }
 
   // Not other supported method
