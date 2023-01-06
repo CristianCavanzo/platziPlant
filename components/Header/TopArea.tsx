@@ -5,7 +5,8 @@ import { Typography } from '@ui/Typography'
 import { Button } from '@ui/Button'
 
 export function TopArea() {
-  const { locales, locale } = useRouter()
+  const { locales, locale, asPath } = useRouter()
+  const pathname = asPath.split('#')[0].split('?')[0]
 
   // Locales aren't configured
   if (locales == undefined || locale == undefined) {
@@ -27,6 +28,7 @@ export function TopArea() {
             className="inline-block"
           >
             <input name="preferredLocale" value={loc} type="hidden"></input>
+            <input name="actualPage" value={pathname} type="hidden"></input>
             <Button
               variant={loc === locale ? 'outlined' : 'text'}
               className="ml-1"

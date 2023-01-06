@@ -22,6 +22,7 @@ const language: NextApiHandler = (request, response) => {
     const newPreferredLocale = request.body.preferredLocale as
       | string
       | undefined
+    const actualPage = request.body.actualPage
 
     // For this page, we don't care setting an invalid value.
     // worst case: the value is ignored and Next.js defaults to defaultLocale. Not critical.
@@ -29,9 +30,8 @@ const language: NextApiHandler = (request, response) => {
       // Heads-up: the NEXT_LOCALE must be set to the `/` path
       path: '/',
     })
-
     // 307 (temporary) redirect to homepage
-    return response.redirect('/')
+    return response.redirect(`/${newPreferredLocale}${actualPage}`)
   }
 
   // Not other supported method
