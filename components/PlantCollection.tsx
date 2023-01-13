@@ -5,6 +5,7 @@ import { Button } from '@ui/Button'
 
 import { Excerpt } from '@components/Excerpt'
 import { Image } from '@components/Image'
+import { useTranslation } from 'next-i18next'
 
 type PlantCollectionProps = {
   plants: Plant[]
@@ -109,6 +110,7 @@ export function PlantEntryVertical({
   description,
   slug,
 }: Plant) {
+  const { t: translation } = useTranslation(['common'])
   return (
     <div className="opacity-95 hover:opacity-100">
       <Link href={`/entry/${slug}`}>
@@ -131,7 +133,7 @@ export function PlantEntryVertical({
           className="py-6"
         />
         <Link href={`/entry/${slug}`} passHref>
-          <Button>Read more</Button>
+          <Button>{translation('readMore')}</Button>
         </Link>
       </div>
     </div>
